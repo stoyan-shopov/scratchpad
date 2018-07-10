@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/">
+        <file>init.fs</file>
+        <file>sf.exe</file>
+    </qresource>
+</RCC>
