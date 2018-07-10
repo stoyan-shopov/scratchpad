@@ -4,12 +4,14 @@
 #include <QDir>
 #include <QStandardPaths>
 #include <QMessageBox>
+#include <QSettings>
 
 MainWindow::MainWindow(QWidget *parent) :
 	QMainWindow(parent),
 	ui(new Ui::MainWindow)
 {
 	ui->setupUi(this);
+	readSettings();
 
 	scratchpad_server.listen("vgacon");
 	sforth.start();
@@ -37,6 +39,22 @@ MainWindow::~MainWindow()
 	delete ui;
 }
 
+void MainWindow::readSettings()
+{
+	QSettings s("shopov", "scratchpad");
+	ui->plainTextEditScratchpad->setPlainText(s.value("scratchpad-contents", QString()).toString());
+	restoreGeometry(s.value("mainwindow-geometry", QByteArray()).toByteArray());
+	restoreState(s.value("mainwindow-state", QByteArray()).toByteArray());
+}
+
+void MainWindow::writeSettings()
+{
+	QSettings s("shopov", "scratchpad");
+	s.setValue("scratchpad-contents", ui->plainTextEditScratchpad->toPlainText());
+	s.setValue("mainwindow-geometry", saveGeometry());
+	s.setValue("mainwindow-state", saveState());
+}
+
 void MainWindow::sforthProcessFinished(int exitCode, QProcess::ExitStatus exitStatus)
 {
 	qDebug() << sforth_process.state();
@@ -47,9 +65,11 @@ void MainWindow::sforthProcessFinished(int exitCode, QProcess::ExitStatus exitSt
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
+	writeSettings();
 	disconnect(& sforth_process, SIGNAL(finished(int,QProcess::ExitStatus)), this, SLOT(sforthProcessFinished(int,QProcess::ExitStatus)));
 	sforth_process.kill();
 	sforth_process.waitForFinished();
 	scratchpad_socket->close();
 	sforth.wait();
+	QMainWindow::closeEvent(event);
 }
