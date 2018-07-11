@@ -16,6 +16,9 @@ MainWindow::MainWindow(QWidget *parent) :
 	QFile f(":/stylesheet.txt");
 	f.open(QFile::ReadOnly);
 	setStyleSheet(f.readAll());
+	QFont font("Monospace");
+	font.setStyleHint(QFont::TypeWriter);
+	ui->plainTextEditScratchpad->setFont(font);
 
 	scratchpad_server.listen("vgacon");
 	sforth.start();
