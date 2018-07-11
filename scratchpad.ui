@@ -54,6 +54,9 @@
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <widget class="QDockWidget" name="dockWidgetScratchpad">
+   <property name="windowTitle">
+    <string>scratchpad</string>
+   </property>
    <attribute name="dockWidgetArea">
     <number>2</number>
    </attribute>

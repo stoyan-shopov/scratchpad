@@ -5,6 +5,7 @@
 #include <QStandardPaths>
 #include <QMessageBox>
 #include <QSettings>
+#include <QFile>
 
 MainWindow::MainWindow(QWidget *parent) :
 	QMainWindow(parent),
@@ -12,6 +13,9 @@ MainWindow::MainWindow(QWidget *parent) :
 {
 	ui->setupUi(this);
 	readSettings();
+	QFile f(":/stylesheet.txt");
+	f.open(QFile::ReadOnly);
+	setStyleSheet(f.readAll());
 
 	scratchpad_server.listen("vgacon");
 	sforth.start();

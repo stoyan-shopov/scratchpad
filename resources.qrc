@@ -2,5 +2,6 @@
     <qresource prefix="/">
         <file>init.fs</file>
         <file>sf.exe</file>
+        <file>stylesheet.txt</file>
     </qresource>
 </RCC>

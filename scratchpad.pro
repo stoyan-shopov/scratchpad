@@ -43,3 +43,6 @@ INCLUDEPATH += ./sforth/
 
 RESOURCES += \
     resources.qrc
+
+DISTFILES += \
+    stylesheet.txt
