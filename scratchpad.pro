@@ -30,14 +30,17 @@ SOURCES += \
     sforth/dictionary.c \
     sforth/engine.c \
     sforth/sf-opt-prog-tools.c \
-    sforth/sf-opt-string.c
+    sforth/sf-opt-string.c \
+    scratchpad-widget.cxx
 
 HEADERS += \
         scratchpad.hxx \
-    sforth.hxx
+    sforth.hxx \
+    scratchpad-widget.hxx
 
 FORMS += \
-        scratchpad.ui
+        scratchpad.ui \
+    scratchpadwidget.ui
 
 INCLUDEPATH += ./sforth/
 

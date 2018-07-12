@@ -6,19 +6,25 @@
 #include <QMessageBox>
 #include <QSettings>
 #include <QFile>
+#include <QDockWidget>
+
+#include "scratchpad-widget.hxx"
 
 MainWindow::MainWindow(QWidget *parent) :
 	QMainWindow(parent),
 	ui(new Ui::MainWindow)
 {
 	ui->setupUi(this);
-	readSettings();
 	QFile f(":/stylesheet.txt");
 	f.open(QFile::ReadOnly);
 	setStyleSheet(f.readAll());
 	QFont font("Monospace");
 	font.setStyleHint(QFont::TypeWriter);
 	ui->plainTextEditScratchpad->setFont(font);
+
+	createNewScratchpadDockWidget();
+
+	readSettings();
 
 	scratchpad_server.listen("vgacon");
 	sforth.start();
@@ -62,6 +68,16 @@ void MainWindow::writeSettings()
 	s.setValue("mainwindow-state", saveState());
 }
 
+void MainWindow::createNewScratchpadDockWidget()
+{
+	auto dw = new QDockWidget("test", this);
+	dw->setObjectName("dock-1");
+	dw->setAllowedAreas(Qt::AllDockWidgetAreas);
+	auto w = new ScratchpadWidget(dw);
+	dw->setWidget(w);
+	addDockWidget(Qt::TopDockWidgetArea, dw);
+}
+
 void MainWindow::sforthProcessFinished(int exitCode, QProcess::ExitStatus exitStatus)
 {
 	qDebug() << sforth_process.state();
@@ -79,4 +95,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
 	scratchpad_socket->close();
 	sforth.wait();
 	QMainWindow::closeEvent(event);
+
+	QList<QDockWidget *> dockWidgets = findChildren<QDockWidget *>();
+	qDebug() << "total dock widgets" << dockWidgets.size();
 }

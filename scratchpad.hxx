@@ -31,6 +31,7 @@ private:
 	void startSforthProcess(void) { sforth_process.start(sforth_executable.fileName()); sforth_process.write("true cr-echo !\n"); }
 	void readSettings(void);
 	void writeSettings(void);
+	void createNewScratchpadDockWidget(void);
 
 	static const QString getBundledExecutableFileName(void)
 	{
