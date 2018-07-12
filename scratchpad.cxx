@@ -7,6 +7,7 @@
 #include <QSettings>
 #include <QFile>
 #include <QDockWidget>
+#include <QUuid>
 
 #include "scratchpad-widget.hxx"
 
@@ -21,9 +22,6 @@ MainWindow::MainWindow(QWidget *parent) :
 	QFont font("Monospace");
 	font.setStyleHint(QFont::TypeWriter);
 	ui->plainTextEditScratchpad->setFont(font);
-
-	createNewScratchpadDockWidget();
-
 	readSettings();
 
 	scratchpad_server.listen("vgacon");
@@ -58,6 +56,13 @@ void MainWindow::readSettings()
 	ui->plainTextEditScratchpad->setPlainText(s.value("scratchpad-contents", QString()).toString());
 	restoreGeometry(s.value("mainwindow-geometry", QByteArray()).toByteArray());
 	restoreState(s.value("mainwindow-state", QByteArray()).toByteArray());
+
+	QStringList dockWidgets = s.value("dock-widgets", QStringList()).toStringList();
+
+	qDebug() << "dock names" << dockWidgets;
+
+	for (auto & d : dockWidgets)
+		createNewScratchpadDockWidget(d);
 }
 
 void MainWindow::writeSettings()
@@ -66,16 +71,34 @@ void MainWindow::writeSettings()
 	s.setValue("scratchpad-contents", ui->plainTextEditScratchpad->toPlainText());
 	s.setValue("mainwindow-geometry", saveGeometry());
 	s.setValue("mainwindow-state", saveState());
+
+	QList<QDockWidget *> dockWidgets = findChildren<QDockWidget *>();
+	qDebug() << "total dock widgets" << dockWidgets.size();
+	QStringList dockWidgetNames;
+	for (auto & d : dockWidgets)
+		if (d == ui->dockWidgetScratchpad)
+			continue;
+	else
+		dockWidgetNames << d->objectName();
+	s.setValue("dock-widgets", dockWidgetNames);
+	qDebug() << "dock names" << dockWidgetNames;
 }
 
-void MainWindow::createNewScratchpadDockWidget()
+void MainWindow::createNewScratchpadDockWidget(const QString & name)
 {
 	auto dw = new QDockWidget("test", this);
-	dw->setObjectName("dock-1");
+	dw->setAttribute(Qt::WA_DeleteOnClose);
 	dw->setAllowedAreas(Qt::AllDockWidgetAreas);
 	auto w = new ScratchpadWidget(dw);
 	dw->setWidget(w);
 	addDockWidget(Qt::TopDockWidgetArea, dw);
+	auto n = name;
+	if (name.isEmpty())
+		n = QUuid::createUuid().toString();
+	if (!n.startsWith("dock-widget-"))
+		n.prepend("dock-widget-");
+	dw->setObjectName(n);
+
 }
 
 void MainWindow::sforthProcessFinished(int exitCode, QProcess::ExitStatus exitStatus)
@@ -95,7 +118,4 @@ void MainWindow::closeEvent(QCloseEvent *event)
 	scratchpad_socket->close();
 	sforth.wait();
 	QMainWindow::closeEvent(event);
-
-	QList<QDockWidget *> dockWidgets = findChildren<QDockWidget *>();
-	qDebug() << "total dock widgets" << dockWidgets.size();
 }
