@@ -17,6 +17,8 @@ public:
 	~ScratchpadWidget();
 	QPlainTextEdit * plainTextEdit(void) { return ui->plainTextEdit; }
 
+signals:
+	void executeSforthCode(const QString & sforthCode);
 private:
 	Ui::ScratchpadWidget *ui;
 };

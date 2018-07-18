@@ -95,6 +95,7 @@ void MainWindow::createNewScratchpadDockWidget(const QString & name, const QStri
 	auto w = new ScratchpadWidget(dw);
 	dw->setWidget(w);
 	w->plainTextEdit()->setPlainText(contents);
+	connect(w, & ScratchpadWidget::executeSforthCode, [=](const QString & sforthCode) { sforth_process.write(sforthCode.toLocal8Bit() + '\n'); sforth_process.waitForBytesWritten(); });
 	addDockWidget(Qt::TopDockWidgetArea, dw);
 	auto n = name;
 	if (name.isEmpty())
@@ -102,7 +103,6 @@ void MainWindow::createNewScratchpadDockWidget(const QString & name, const QStri
 	if (!n.startsWith("dock-widget-"))
 		n.prepend("dock-widget-");
 	dw->setObjectName(n);
-
 }
 
 void MainWindow::sforthProcessFinished(int exitCode, QProcess::ExitStatus exitStatus)
