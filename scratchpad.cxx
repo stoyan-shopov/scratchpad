@@ -42,6 +42,7 @@ MainWindow::MainWindow(QWidget *parent) :
 	connect(& sforth_process, & QProcess::readyReadStandardOutput, [=] { ui->sforthTextEdit->appendPlainText(sforth_process.readAllStandardOutput()); });
 	connect(& sforth_process, SIGNAL(finished(int,QProcess::ExitStatus)), this, SLOT(sforthProcessFinished(int,QProcess::ExitStatus)));
 	connect(ui->sforthLineEdit, QLineEdit::returnPressed, this, [=] { sforth_process.write(ui->sforthLineEdit->text().toLocal8Bit() + '\n'); sforth_process.waitForBytesWritten(); ui->sforthLineEdit->clear(); });
+	connect(ui->pushButtonNewScratchpad, QPushButton::clicked, this, [=] { createNewScratchpadDockWidget(); });
 	startSforthProcess();
 }
 
@@ -53,16 +54,15 @@ MainWindow::~MainWindow()
 void MainWindow::readSettings()
 {
 	QSettings s("shopov", "scratchpad");
-	ui->plainTextEditScratchpad->setPlainText(s.value("scratchpad-contents", QString()).toString());
-	restoreGeometry(s.value("mainwindow-geometry", QByteArray()).toByteArray());
-	restoreState(s.value("mainwindow-state", QByteArray()).toByteArray());
-
 	QStringList dockWidgets = s.value("dock-widgets", QStringList()).toStringList();
 
 	qDebug() << "dock names" << dockWidgets;
-
 	for (auto & d : dockWidgets)
-		createNewScratchpadDockWidget(d);
+		createNewScratchpadDockWidget(d, s.value(d + "-contents", QString()).toString());
+
+	ui->plainTextEditScratchpad->setPlainText(s.value("scratchpad-contents", QString()).toString());
+	restoreGeometry(s.value("mainwindow-geometry", QByteArray()).toByteArray());
+	restoreState(s.value("mainwindow-state", QByteArray()).toByteArray());
 }
 
 void MainWindow::writeSettings()
@@ -78,19 +78,23 @@ void MainWindow::writeSettings()
 	for (auto & d : dockWidgets)
 		if (d == ui->dockWidgetScratchpad)
 			continue;
-	else
-		dockWidgetNames << d->objectName();
+		else
+		{
+			dockWidgetNames << d->objectName();
+			s.setValue(d->objectName() + "-contents", dynamic_cast<ScratchpadWidget *>(d->widget())->plainTextEdit()->toPlainText());
+		}
 	s.setValue("dock-widgets", dockWidgetNames);
 	qDebug() << "dock names" << dockWidgetNames;
 }
 
-void MainWindow::createNewScratchpadDockWidget(const QString & name)
+void MainWindow::createNewScratchpadDockWidget(const QString & name, const QString & contents)
 {
 	auto dw = new QDockWidget("test", this);
 	dw->setAttribute(Qt::WA_DeleteOnClose);
 	dw->setAllowedAreas(Qt::AllDockWidgetAreas);
 	auto w = new ScratchpadWidget(dw);
 	dw->setWidget(w);
+	w->plainTextEdit()->setPlainText(contents);
 	addDockWidget(Qt::TopDockWidgetArea, dw);
 	auto n = name;
 	if (name.isEmpty())

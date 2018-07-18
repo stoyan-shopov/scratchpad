@@ -1,5 +1,4 @@
 #include "scratchpad-widget.hxx"
-#include "ui_scratchpadwidget.h"
 
 #include <QDebug>
 

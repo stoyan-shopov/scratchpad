@@ -2,6 +2,7 @@
 #define SCRATCHPADWIDGET_HXX
 
 #include <QWidget>
+#include "ui_scratchpadwidget.h"
 
 namespace Ui {
 class ScratchpadWidget;
@@ -14,6 +15,7 @@ class ScratchpadWidget : public QWidget
 public:
 	explicit ScratchpadWidget(QWidget *parent = 0);
 	~ScratchpadWidget();
+	QPlainTextEdit * plainTextEdit(void) { return ui->plainTextEdit; }
 
 private:
 	Ui::ScratchpadWidget *ui;

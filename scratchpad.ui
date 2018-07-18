@@ -25,6 +25,13 @@
        </widget>
       </item>
       <item>
+       <widget class="QPushButton" name="pushButtonNewScratchpad">
+        <property name="text">
+         <string>new scratchpad</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QLineEdit" name="sforthLineEdit"/>
       </item>
      </layout>
