@@ -24,6 +24,10 @@ MainWindow::MainWindow(QWidget *parent) :
 	ui->plainTextEditScratchpad->setFont(font);
 	readSettings();
 
+	fileSystemModel.setRootPath("");
+	fileSystemModel.iconProvider()->setOptions(QFileIconProvider::DontUseCustomDirectoryIcons);
+	ui->treeView->setModel(& fileSystemModel);
+
 	scratchpad_server.listen("vgacon");
 	sforth.start();
 	scratchpad_server.waitForNewConnection(-1);

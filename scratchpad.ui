@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>400</width>
-    <height>300</height>
+    <height>325</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -38,6 +38,9 @@
     </item>
     <item>
      <widget class="QPlainTextEdit" name="sforthTextEdit"/>
+    </item>
+    <item>
+     <widget class="QTreeView" name="treeView"/>
     </item>
    </layout>
   </widget>

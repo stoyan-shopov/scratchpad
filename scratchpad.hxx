@@ -6,6 +6,8 @@
 #include <QLocalSocket>
 #include <QProcess>
 #include <QFile>
+#include <QFileSystemModel>
+#include <QFileIconProvider>
 
 #include "sforth.hxx"
 
@@ -32,6 +34,7 @@ private:
 	void readSettings(void);
 	void writeSettings(void);
 	void createNewScratchpadDockWidget(const QString & name = QString(), const QString & contents = QString());
+	QFileSystemModel fileSystemModel;
 
 	static const QString getBundledExecutableFileName(void)
 	{
