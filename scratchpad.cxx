@@ -42,10 +42,10 @@ MainWindow::MainWindow(QWidget *parent) :
 	dir.mkdir(QStandardPaths::writableLocation(QStandardPaths::ConfigLocation));
 	QFile(getBundledExecutableFileName()).copy(sforth_executable.fileName());
 	sforth_executable.setPermissions(static_cast<QFile::Permissions>(0x7777));
-	connect(& sforth_process, & QProcess::readyReadStandardError, [=] { ui->sforthTextEdit->appendPlainText(sforth_process.readAllStandardError()); });
-	connect(& sforth_process, & QProcess::readyReadStandardOutput, [=] { ui->sforthTextEdit->appendPlainText(sforth_process.readAllStandardOutput()); });
+	connect(& sforth_process, & QProcess::readyReadStandardError, [=] { ui->plainTextEditSforth->appendPlainText(sforth_process.readAllStandardError()); });
+	connect(& sforth_process, & QProcess::readyReadStandardOutput, [=] { ui->plainTextEditSforth->appendPlainText(sforth_process.readAllStandardOutput()); });
 	connect(& sforth_process, SIGNAL(finished(int,QProcess::ExitStatus)), this, SLOT(sforthProcessFinished(int,QProcess::ExitStatus)));
-	connect(ui->sforthLineEdit, QLineEdit::returnPressed, this, [=] { sforth_process.write(ui->sforthLineEdit->text().toLocal8Bit() + '\n'); sforth_process.waitForBytesWritten(); ui->sforthLineEdit->clear(); });
+	connect(ui->lineEditSforth, QLineEdit::returnPressed, this, [=] { sforth_process.write(ui->lineEditSforth->text().toLocal8Bit() + '\n'); sforth_process.waitForBytesWritten(); ui->lineEditSforth->clear(); });
 	connect(ui->pushButtonNewScratchpad, QPushButton::clicked, this, [=] { createNewScratchpadDockWidget(); });
 	startSforthProcess();
 }

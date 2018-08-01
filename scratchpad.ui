@@ -32,12 +32,12 @@
        </widget>
       </item>
       <item>
-       <widget class="QLineEdit" name="sforthLineEdit"/>
+       <widget class="QLineEdit" name="lineEditSforth"/>
       </item>
      </layout>
     </item>
     <item>
-     <widget class="QPlainTextEdit" name="sforthTextEdit"/>
+     <widget class="QPlainTextEdit" name="plainTextEditSforth"/>
     </item>
     <item>
      <widget class="QTreeView" name="treeView"/>
