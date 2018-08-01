@@ -26,14 +26,14 @@ MainWindow::MainWindow(QWidget *parent) :
 
 	fileSystemModel.setRootPath("");
 	fileSystemModel.iconProvider()->setOptions(QFileIconProvider::DontUseCustomDirectoryIcons);
-	ui->treeView->setModel(& fileSystemModel);
+	ui->treeViewFileSystem->setModel(& fileSystemModel);
 
 	scratchpad_server.listen("vgacon");
 	sforth.start();
 	scratchpad_server.waitForNewConnection(-1);
 	scratchpad_socket = scratchpad_server.nextPendingConnection();
 	scratchpad_server.close();
-	//connect(vgacon_socket, SIGNAL(readyRead()), this, SLOT(socketReadyRead()));
+	connect(scratchpad_socket, & QLocalSocket::readyRead, [=]{ ui->plainTextEditSforth->appendPlainText(scratchpad_socket->readAll());});
 	scratchpad_socket->write("unused . cr\n");
 
 	QDir dir;
@@ -80,7 +80,7 @@ void MainWindow::writeSettings()
 	qDebug() << "total dock widgets" << dockWidgets.size();
 	QStringList dockWidgetNames;
 	for (auto & d : dockWidgets)
-		if (d == ui->dockWidgetScratchpad)
+		if (d == ui->dockWidgetScratchpad || d == ui->dockWidgetFileSystem)
 			continue;
 		else
 		{

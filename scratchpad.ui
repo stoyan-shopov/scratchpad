@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>325</height>
+    <width>564</width>
+    <height>407</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -39,9 +39,6 @@
     <item>
      <widget class="QPlainTextEdit" name="plainTextEditSforth"/>
     </item>
-    <item>
-     <widget class="QTreeView" name="treeView"/>
-    </item>
    </layout>
   </widget>
   <widget class="QMenuBar" name="menuBar">
@@ -49,7 +46,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>400</width>
+     <width>564</width>
      <height>21</height>
     </rect>
    </property>
@@ -74,6 +71,18 @@
     <layout class="QVBoxLayout" name="verticalLayout_2">
      <item>
       <widget class="QPlainTextEdit" name="plainTextEditScratchpad"/>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <widget class="QDockWidget" name="dockWidgetFileSystem">
+   <attribute name="dockWidgetArea">
+    <number>2</number>
+   </attribute>
+   <widget class="QWidget" name="dockWidgetContents_2">
+    <layout class="QVBoxLayout" name="verticalLayout_3">
+     <item>
+      <widget class="QTreeView" name="treeViewFileSystem"/>
      </item>
     </layout>
    </widget>
