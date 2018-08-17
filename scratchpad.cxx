@@ -47,6 +47,7 @@ MainWindow::MainWindow(QWidget *parent) :
 	connect(& sforth_process, SIGNAL(finished(int,QProcess::ExitStatus)), this, SLOT(sforthProcessFinished(int,QProcess::ExitStatus)));
 	connect(ui->lineEditSforth, QLineEdit::returnPressed, this, [=] { sforth_process.write(ui->lineEditSforth->text().toLocal8Bit() + '\n'); sforth_process.waitForBytesWritten(); ui->lineEditSforth->clear(); });
 	connect(ui->pushButtonNewScratchpad, QPushButton::clicked, this, [=] { createNewScratchpadDockWidget(); });
+	connect(ui->pushButtonNewScratchpad, QPushButton::clicked, this, [=] { writeSettings(); });
 	startSforthProcess();
 }
 
