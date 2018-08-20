@@ -36,6 +36,7 @@ private:
 	void createNewScratchpadDockWidget(const QString & name = QString(), const QString & contents = QString());
 	QFileSystemModel fileSystemModel;
 	void addPathToFavorites(void);
+	void favoritesItemSelected(const QString & filePath);
 
 	static const QString getBundledExecutableFileName(void)
 	{

@@ -33,6 +33,7 @@ MainWindow::MainWindow(QWidget *parent) :
 	fileSystemModel.iconProvider()->setOptions(QFileIconProvider::DontUseCustomDirectoryIcons);
 	ui->treeViewFileSystem->setModel(& fileSystemModel);
 
+	connect(ui->comboBoxExplorerFavorites, QOverload<const QString &>::of(&QComboBox::currentIndexChanged), [=](const QString & text){ favoritesItemSelected(text); });
 	connect(ui->pushButtonAddPathToFavorites, & QPushButton::clicked, [=] { addPathToFavorites(); });
 
 	scratchpad_server.listen("vgacon");
@@ -75,6 +76,8 @@ void MainWindow::readSettings()
 	ui->plainTextEditScratchpad->setPlainText(s.value("scratchpad-contents", QString()).toString());
 	restoreGeometry(s.value("mainwindow-geometry", QByteArray()).toByteArray());
 	restoreState(s.value("mainwindow-state", QByteArray()).toByteArray());
+
+	ui->comboBoxExplorerFavorites->addItems(s.value("filesystem-favorites", QStringList()).toStringList());
 }
 
 void MainWindow::writeSettings()
@@ -96,6 +99,9 @@ void MainWindow::writeSettings()
 			s.setValue(d->objectName() + "-contents", dynamic_cast<ScratchpadWidget *>(d->widget())->plainTextEdit()->toPlainText());
 		}
 	s.setValue("dock-widgets", dockWidgetNames);
+	QStringList favorites;
+	for (auto i = 0; i < ui->comboBoxExplorerFavorites->count(); favorites << ui->comboBoxExplorerFavorites->itemText(i ++));
+	s.setValue("filesystem-favorites", favorites);
 	qDebug() << "dock names" << dockWidgetNames;
 }
 
@@ -123,6 +129,18 @@ auto i = ui->treeViewFileSystem->currentIndex();
 QString path;
 	if (i.isValid() && ui->comboBoxExplorerFavorites->findText(path = fileSystemModel.filePath(i)) == -1)
 		ui->comboBoxExplorerFavorites->addItem(path);
+}
+
+void MainWindow::favoritesItemSelected(const QString &filePath)
+{
+auto i = fileSystemModel.index(filePath);
+	if (i.isValid())
+	{
+		ui->treeViewFileSystem->setCurrentIndex(i);
+		ui->treeViewFileSystem->scrollTo(i, QAbstractItemView::PositionAtTop);
+		ui->treeViewFileSystem->ensurePolished();
+		//ui->treeViewFileSystem->scrollTo(i);
+	}
 }
 
 void MainWindow::sforthProcessFinished(int exitCode, QProcess::ExitStatus exitStatus)
