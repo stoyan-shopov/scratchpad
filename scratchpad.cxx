@@ -24,9 +24,16 @@ MainWindow::MainWindow(QWidget *parent) :
 	ui->plainTextEditScratchpad->setFont(font);
 	readSettings();
 
+	ui->treeViewFileSystem->setContextMenuPolicy(Qt::CustomContextMenu);
+	connect(ui->treeViewFileSystem, & QTreeView::customContextMenuRequested, [=] (const QPoint & point) { qDebug() << "context menu requested"; });
+	connect(ui->treeViewFileSystem, & QTreeView::activated, [=] (const QModelIndex &index) { qDebug() << "activated: " << fileSystemModel.fileName(index); } );
+	connect(ui->treeViewFileSystem, & QTreeView::pressed, [=] (const QModelIndex &index) { qDebug() << "pressed: " << fileSystemModel.fileName(index); } );
+	connect(ui->treeViewFileSystem, & QTreeView::clicked, [=] (const QModelIndex &index) { qDebug() << "clicked: " << fileSystemModel.fileName(index); } );
 	fileSystemModel.setRootPath("");
 	fileSystemModel.iconProvider()->setOptions(QFileIconProvider::DontUseCustomDirectoryIcons);
 	ui->treeViewFileSystem->setModel(& fileSystemModel);
+
+	connect(ui->pushButtonAddPathToFavorites, & QPushButton::clicked, [=] { addPathToFavorites(); });
 
 	scratchpad_server.listen("vgacon");
 	sforth.start();
@@ -108,6 +115,14 @@ void MainWindow::createNewScratchpadDockWidget(const QString & name, const QStri
 	if (!n.startsWith("dock-widget-"))
 		n.prepend("dock-widget-");
 	dw->setObjectName(n);
+}
+
+void MainWindow::addPathToFavorites()
+{
+auto i = ui->treeViewFileSystem->currentIndex();
+QString path;
+	if (i.isValid() && ui->comboBoxExplorerFavorites->findText(path = fileSystemModel.filePath(i)) == -1)
+		ui->comboBoxExplorerFavorites->addItem(path);
 }
 
 void MainWindow::sforthProcessFinished(int exitCode, QProcess::ExitStatus exitStatus)

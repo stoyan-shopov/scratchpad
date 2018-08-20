@@ -35,6 +35,7 @@ private:
 	void writeSettings(void);
 	void createNewScratchpadDockWidget(const QString & name = QString(), const QString & contents = QString());
 	QFileSystemModel fileSystemModel;
+	void addPathToFavorites(void);
 
 	static const QString getBundledExecutableFileName(void)
 	{
