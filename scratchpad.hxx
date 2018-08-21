@@ -10,6 +10,7 @@
 #include <QFileIconProvider>
 
 #include "sforth.hxx"
+#include "ui_scratchpad.h"
 
 namespace Ui {
 class MainWindow;
@@ -36,7 +37,18 @@ private:
 	void createNewScratchpadDockWidget(const QString & name = QString(), const QString & contents = QString());
 	QFileSystemModel fileSystemModel;
 	void addPathToFavorites(void);
+	void runExplorer(void);
+	void runShell(void);
+	void fileActivated(const QModelIndex & index);
 	void favoritesItemSelected(const QString & filePath);
+	QString getSelectedFilename(void)
+	{
+		auto i = ui->treeViewFileSystem->currentIndex();
+		QString fileName;
+		if (i.isValid())
+			fileName = fileSystemModel.fileInfo(i).absoluteFilePath();
+		return fileName;
+	}
 
 	static const QString getBundledExecutableFileName(void)
 	{

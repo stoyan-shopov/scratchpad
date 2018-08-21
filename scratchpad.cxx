@@ -1,5 +1,4 @@
 #include "scratchpad.hxx"
-#include "ui_scratchpad.h"
 
 #include <QDir>
 #include <QStandardPaths>
@@ -8,6 +7,7 @@
 #include <QFile>
 #include <QDockWidget>
 #include <QUuid>
+#include <QProcess>
 
 #include "scratchpad-widget.hxx"
 
@@ -26,7 +26,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
 	ui->treeViewFileSystem->setContextMenuPolicy(Qt::CustomContextMenu);
 	connect(ui->treeViewFileSystem, & QTreeView::customContextMenuRequested, [=] (const QPoint & point) { qDebug() << "context menu requested"; });
-	connect(ui->treeViewFileSystem, & QTreeView::activated, [=] (const QModelIndex &index) { qDebug() << "activated: " << fileSystemModel.fileName(index); } );
+	connect(ui->treeViewFileSystem, & QTreeView::activated, [=] (const QModelIndex &index) { qDebug() << "activated: " << fileSystemModel.fileName(index); fileActivated(index); } );
 	connect(ui->treeViewFileSystem, & QTreeView::pressed, [=] (const QModelIndex &index) { qDebug() << "pressed: " << fileSystemModel.fileName(index); } );
 	connect(ui->treeViewFileSystem, & QTreeView::clicked, [=] (const QModelIndex &index) { qDebug() << "clicked: " << fileSystemModel.fileName(index); } );
 	fileSystemModel.setRootPath("");
@@ -35,6 +35,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
 	connect(ui->comboBoxExplorerFavorites, QOverload<const QString &>::of(&QComboBox::currentIndexChanged), [=](const QString & text){ favoritesItemSelected(text); });
 	connect(ui->pushButtonAddPathToFavorites, & QPushButton::clicked, [=] { addPathToFavorites(); });
+	connect(ui->pushButtonRunShell, & QPushButton::clicked, [=] { runShell(); });
+	connect(ui->pushButtonRunExplorer, & QPushButton::clicked, [=] { runExplorer(); });
 
 	scratchpad_server.listen("vgacon");
 	sforth.start();
@@ -125,10 +127,39 @@ void MainWindow::createNewScratchpadDockWidget(const QString & name, const QStri
 
 void MainWindow::addPathToFavorites()
 {
-auto i = ui->treeViewFileSystem->currentIndex();
-QString path;
-	if (i.isValid() && ui->comboBoxExplorerFavorites->findText(path = fileSystemModel.filePath(i)) == -1)
-		ui->comboBoxExplorerFavorites->addItem(path);
+auto fileName = getSelectedFilename();
+	if (fileName.length() && ui->comboBoxExplorerFavorites->findText(fileName) == -1)
+		ui->comboBoxExplorerFavorites->addItem(fileName);
+}
+
+void MainWindow::runExplorer()
+{
+auto f = getSelectedFilename();
+	if (f.isEmpty())
+		return;
+	QFileInfo fi(f);
+	QStringList args;
+	if (!QProcess::startDetached("explorer",
+			args
+				<< QString("/select,%1").arg(QDir::toNativeSeparators(fi.absoluteFilePath()))
+				     ))
+		QMessageBox::critical(0, "error running explorer", "failed to start explorer");
+	qDebug() << "explorer run arguments:" << args;
+}
+
+void MainWindow::runShell()
+{
+}
+
+void MainWindow::fileActivated(const QModelIndex &index)
+{
+	if (!fileSystemModel.fileInfo(index).isFile())
+		return;
+	if (!QProcess::startDetached("explorer",
+			QStringList()
+				<< QString("%1").arg(QDir::toNativeSeparators(fileSystemModel.fileInfo(index).absoluteFilePath()))
+				     ))
+		QMessageBox::critical(0, "error running explorer", "failed to start explorer");
 }
 
 void MainWindow::favoritesItemSelected(const QString &filePath)
