@@ -37,6 +37,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
 	connect(ui->comboBoxExplorerFavorites, QOverload<const QString &>::of(&QComboBox::currentIndexChanged), [=](const QString & text){ favoritesItemSelected(text); });
 	connect(ui->pushButtonAddPathToFavorites, & QPushButton::clicked, [=] { addPathToFavorites(); });
+	connect(ui->pushButtonRemovePathFromFavorites, & QPushButton::clicked, [=] { removePathFromFavorites(); });
 	connect(ui->pushButtonRunShell, & QPushButton::clicked, [=] { runShell(); });
 	connect(ui->pushButtonRunExplorer, & QPushButton::clicked, [=] { runExplorer(); });
 
@@ -81,6 +82,8 @@ void MainWindow::readSettings()
 	restoreGeometry(s.value("mainwindow-geometry", QByteArray()).toByteArray());
 	restoreState(s.value("mainwindow-state", QByteArray()).toByteArray());
 
+	/* the first item - at index 0 - is special; it designates 'no selection' */
+	ui->comboBoxExplorerFavorites->addItem("<<< not selected >>>");
 	ui->comboBoxExplorerFavorites->addItems(s.value("filesystem-favorites", QStringList()).toStringList());
 }
 
@@ -104,7 +107,7 @@ void MainWindow::writeSettings()
 		}
 	s.setValue("dock-widgets", dockWidgetNames);
 	QStringList favorites;
-	for (auto i = 0; i < ui->comboBoxExplorerFavorites->count(); favorites << ui->comboBoxExplorerFavorites->itemText(i ++));
+	for (auto i = /* skip the first, special ('not selected') item */ 1; i < ui->comboBoxExplorerFavorites->count(); favorites << ui->comboBoxExplorerFavorites->itemText(i ++));
 	s.setValue("filesystem-favorites", favorites);
 	qDebug() << "dock names" << dockWidgetNames;
 }
@@ -132,6 +135,13 @@ void MainWindow::addPathToFavorites()
 auto fileName = getSelectedFilename();
 	if (fileName.length() && ui->comboBoxExplorerFavorites->findText(fileName) == -1)
 		ui->comboBoxExplorerFavorites->addItem(fileName);
+}
+
+void MainWindow::removePathFromFavorites()
+{
+auto i = ui->comboBoxExplorerFavorites->currentIndex();
+	if (i > /* skip the first, special ('not selected') item */ 0)
+		ui->comboBoxExplorerFavorites->removeItem(i);
 }
 
 void MainWindow::runExplorer()

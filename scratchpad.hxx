@@ -37,6 +37,7 @@ private:
 	void createNewScratchpadDockWidget(const QString & name = QString(), const QString & contents = QString());
 	QFileSystemModel fileSystemModel;
 	void addPathToFavorites(void);
+	void removePathFromFavorites(void);
 	void runExplorer(void);
 	void runShell(void);
 	void fileActivated(const QModelIndex & index);
