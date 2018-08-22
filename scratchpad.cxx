@@ -9,6 +9,8 @@
 #include <QUuid>
 #include <QProcess>
 
+#include <windows.h>
+
 #include "scratchpad-widget.hxx"
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -147,8 +149,36 @@ auto f = getSelectedFilename();
 	qDebug() << "explorer run arguments:" << args;
 }
 
+/*! \todo	debug and clean this up */
 void MainWindow::runShell()
 {
+auto f = getSelectedFilename();
+	if (f.isEmpty())
+		return;
+
+	QProcess * p = new QProcess(this);
+	p->setCreateProcessArgumentsModifier([] (QProcess::CreateProcessArguments *args)
+	{
+		args->flags |= CREATE_NEW_CONSOLE;
+		args->startupInfo->dwFlags &= ~STARTF_USESTDHANDLES;
+		args->startupInfo->dwFlags |= STARTF_USEFILLATTRIBUTE;
+		args->startupInfo->dwFillAttribute = BACKGROUND_BLUE | FOREGROUND_RED
+				| FOREGROUND_INTENSITY;
+	});
+	/*! c\todo	?!?!?! startDetached does not show the console window */
+	p->setWorkingDirectory(QFileInfo(f).absolutePath());
+	p->start("C:\\Windows\\System32\\cmd.exe", QStringList() << "/k" << "title" << "The Child Process");
+	//p->start("C:\\Windows\\System32\\cmd.exe", QStringList());
+#if 0
+	QFileInfo fi(f);
+	QStringList args;
+	if (!p.startDetached("cmd",
+			args
+				//<< QString("/select,%1").arg(QDir::toNativeSeparators(fi.absoluteFilePath()))
+				     , fi.absolutePath()))
+		QMessageBox::critical(0, "error running shell", "failed to start shell");
+	qDebug() << "shell run arguments:" << args;
+#endif
 }
 
 void MainWindow::fileActivated(const QModelIndex &index)
