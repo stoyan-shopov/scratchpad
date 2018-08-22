@@ -24,6 +24,7 @@ MainWindow::MainWindow(QWidget *parent) :
 	QFont font("Monospace");
 	font.setStyleHint(QFont::TypeWriter);
 	ui->plainTextEditScratchpad->setFont(font);
+	ui->treeViewFileSystem->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
 	readSettings();
 
 	ui->treeViewFileSystem->setContextMenuPolicy(Qt::CustomContextMenu);
